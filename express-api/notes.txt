@@ -1,0 +1,8 @@
+TO DO's:
+    - add cors
+    
+
+
+require('crypto').randomBytes(64).toString('hex')
+thunder client: headers --> Authorization: Bearer <token>
+
