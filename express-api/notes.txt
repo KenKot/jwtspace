@@ -1,5 +1,7 @@
 TO DO's:
     - add cors
+    - String length constraints
+    - Cascade on deletes
     
 
 

@@ -18,11 +18,13 @@ module.exports = {
     for (let i = 1; i < 11; i++) {
       users.push({
         email: `bob${i}@gmail.com`,
+        username: `userbob${i}`,
         password: hashedPassword,
+        firstName: `bob${i}`,
+        lastName: `smith${i}`,
+        birthday: "2004-01-16",
       });
     }
-
-    console.log(users);
 
     return queryInterface.bulkInsert("Users", users);
   },
