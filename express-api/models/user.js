@@ -1,6 +1,6 @@
 "use strict";
 
-const { Model } = require("sequelize");
+const {Model} = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -12,8 +12,25 @@ module.exports = (sequelize, DataTypes) => {
       User.hasOne(models.Profile, {
         foreignKey: "userId",
       });
+
+      User.belongsToMany(models.Role, {
+        through: "UserRoles",
+        foreignKey: "userId",
+      });
+    }
+    // Instance method to get roles
+    async fetchRoles() {
+      try {
+        // Calling Sequelize's built-in getRoles method
+        const roles = await this.getRoles();
+        return roles.map((role) => role.name);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+        throw error;
+      }
     }
   }
+
   User.init(
     {
       email: DataTypes.STRING,

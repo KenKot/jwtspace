@@ -1,0 +1,9 @@
+const userId = 1;
+
+let a = await User.findByPk(userId, {
+  include: [{
+    model: Role,
+    as: 'Roles', 
+    through: { attributes: [] } // This will exclude the join table attributes in the result
+  }]
+})

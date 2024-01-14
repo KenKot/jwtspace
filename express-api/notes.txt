@@ -1,8 +1,13 @@
 TO DO's:
-    - add cors
+    - have 1 role per user VS many to many
     - String length constraints
     - Cascade on deletes
-    - use asnycHandler
+    - private/public profiles
+    - last online
+    
+
+
+    
     
 
 
@@ -25,7 +30,7 @@ sequelize init
 sequelize model:create --name User --attributes "email:string password:string token:string"
 sequelize seed:create --name users
 
-
+visit "calendar_event_planner" for many-to-many 
 
 
 

@@ -1,18 +1,17 @@
-// const express = require("express");
-// const app = express.Router();
-
 const models = require("../models");
 const User = models.User;
 const Profile = models.Profile;
+const UserRole = models.UserRole;
 
 const bcrypt = require("bcrypt");
 const sequelize = require("../config/database");
 
-// CREATE USER (W/ PROFILE)
-const createUserWithProfile = async (req, res) => {
-  //confirm matching passwords
-  //user doesnt already exist
+const asyncHandler = require("express-async-handler");
 
+// DESCRIPT: create new user (w/ their profile)
+// ROUTE: /register
+// ACCESS: public
+const createUserWithProfile = asyncHandler(async (req, res) => {
   const t = await sequelize.transaction(); // Start a new transaction
 
   try {
@@ -26,17 +25,28 @@ const createUserWithProfile = async (req, res) => {
       birthday,
     } = req.body;
 
-    console.log("backend req.body: ", req.body);
+    if (
+      !firstName ||
+      !lastName ||
+      !username ||
+      !email ||
+      !password1 ||
+      !password2 ||
+      !birthday
+    ) {
+      return res.status(400).json({message: "All fields are required"});
+    }
 
     // Check if user already exists
-    const foundUser = await User.findOne({ where: { email } });
+    const foundUser = await User.findOne({where: {email}});
     if (foundUser) {
-      return res.status(400).json({ error: "User already exists" });
+      //409 code for "conflict"
+      return res.status(409).json({error: "User already exists"});
     }
 
     // Check for password match
     if (password1 !== password2) {
-      return res.status(400).json({ error: "Passwords do not match" });
+      return res.status(400).json({error: "Passwords do not match"});
     }
 
     // Hash password
@@ -51,19 +61,28 @@ const createUserWithProfile = async (req, res) => {
         password: hashedPassword,
         birthday,
       },
-      { transaction: t }
+      {transaction: t}
     );
 
     const newProfile = await Profile.create(
       {
         userId: newUser.id,
       },
-      { transaction: t }
+      {transaction: t}
+    );
+
+    const userRoles = await UserRole.create(
+      {
+        userId: newUser.id,
+        roleId: 1, // 1 for 'user' permission/role
+      },
+      {transaction: t}
     );
 
     await t.commit();
 
-    res.status(201).send({ userId: newUser.id });
+    res.status(201).send({userId: newUser.id, message: "New user Created"});
+    // res.status(201).send({userId: newUser.id});
   } catch (error) {
     // If an error is caught, we roll back the transaction.
     await t.rollback();
@@ -73,6 +92,6 @@ const createUserWithProfile = async (req, res) => {
       details: error.message,
     });
   }
-};
+});
 
-module.exports = { createUserWithProfile };
+module.exports = {createUserWithProfile};
