@@ -1,12 +1,16 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const cors = require("cors");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use("/users", require("./routes/users"));
 
 app.get("/", verifyToken, (req, res) => {
   // verifyToken added user info onto "req.user"
@@ -15,7 +19,6 @@ app.get("/", verifyToken, (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-
   const user = {
     name: "bob",
     id: 1,

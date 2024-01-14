@@ -10,7 +10,7 @@ module.exports = {
     for (let i = 1; i <= 10; i++) {
       profiles.push({
         userId: i,
-        about: `About user ${i}`,
+        about: `About user ${i}!`,
         desiredMeets: `Desired meets for user ${i}`,
         mood: `Mood of user ${i}`,
         quote: `Favorite quote of user ${i}`,
