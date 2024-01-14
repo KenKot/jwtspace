@@ -1,16 +1,31 @@
-require("dotenv").config();
+require("dotenv").config(); //will work in EVERY file!
 const express = require("express");
 const app = express();
+
 const cors = require("cors");
+const corsOptions = require("./config/corsOptions");
+
+const path = require("path");
+
+const { logger } = require("./middleware/logger");
+const errorHandler = require("./middleware/errorHandler");
+
+const cookieParser = require("cookie-parser");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-app.use(cors());
+app.use(logger);
+app.use("/", express.static(path.join(__dirname, "public"))); // or app.use(express.static('public'))
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
+app.use("/", require("./routes/root"));
 app.use("/users", require("./routes/users"));
+app.use("/register", require("./routes/register"));
+app.use("/auth", require("./routes/auth"));
 
 app.get("/", verifyToken, (req, res) => {
   // verifyToken added user info onto "req.user"
@@ -30,6 +45,24 @@ app.post("/login", (req, res) => {
   res.json({ accessToken });
 });
 
+app.all("*", (req, res) => {
+  res.status(404);
+  if (req.accepts("html")) {
+    res.sendFile(path.join(__dirname, "views/404.html"));
+  } else if (req.accepts("json")) {
+    res.json({ message: "404 not found" });
+  } else {
+    res.type("txt").send("404 not found");
+  }
+});
+
+app.use(errorHandler);
+
+app.listen(3000, () => {
+  console.log("Listening on port 3000");
+});
+
+// HELPERS:
 function verifyToken(req, res, next) {
   const bearerHeader = req.headers["authorization"];
 
@@ -46,7 +79,3 @@ function verifyToken(req, res, next) {
     }
   });
 }
-
-app.listen(3000, () => {
-  console.log("Listening on port 3000");
-});
