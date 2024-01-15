@@ -1,5 +1,14 @@
-npm i react-router-dom
+Using the Access Token
+For each API request that requires authentication, you should include the access token in the request headers:
 
+javascript
+Copy code
+const { user, accessToken } = useUserContext();
 
-const cors = require("cors");
-app.use(cors());
+// Example of an authenticated API request
+const response = await fetch('http://your-backend-url.com/protected-route', {
+  headers: {
+    'Authorization': `Bearer ${accessToken}`,
+    // other headers...
+  },
+});
