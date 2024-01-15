@@ -27,23 +27,29 @@ app.use("/users", require("./routes/users"));
 app.use("/register", require("./routes/register"));
 app.use("/auth", require("./routes/auth"));
 
-app.get("/", verifyToken, (req, res) => {
-  // verifyToken added user info onto "req.user"
-
-  res.json(req.user);
+// for testing verifyJWT:
+app.get("/hi", require("./middleware/verifyJWT"), (req, res) => {
+  // app.get("/hi", (req, res) => {
+  res.send({ message: "hello" });
 });
 
-app.post("/login", (req, res) => {
-  const user = {
-    name: "bob",
-    id: 1,
-  };
+// app.get("/", verifyToken, (req, res) => {
+//   // verifyToken added user info onto "req.user"
 
-  const message = req.body.message;
+//   res.json(req.user);
+// });
 
-  const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
-  res.json({ accessToken });
-});
+// app.post("/login", (req, res) => {
+//   const user = {
+//     name: "bob",
+//     id: 1,
+//   };
+
+//   const message = req.body.message;
+
+//   const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+//   res.json({ accessToken });
+// });
 
 app.all("*", (req, res) => {
   res.status(404);
@@ -63,19 +69,19 @@ app.listen(3000, () => {
 });
 
 // HELPERS:
-function verifyToken(req, res, next) {
-  const bearerHeader = req.headers["authorization"];
+// function verifyToken(req, res, next) {
+//   const bearerHeader = req.headers["authorization"];
 
-  const token = bearerHeader && bearerHeader.split(" ")[1];
+//   const token = bearerHeader && bearerHeader.split(" ")[1];
 
-  if (!token) return res.sendStatus(401);
+//   if (!token) return res.sendStatus(401);
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ error: "Token is not valid" });
-    } else {
-      req.user = decoded; // Attach the decoded token (which should include the user info) to the req object
-      next();
-    }
-  });
-}
+//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+//     if (err) {
+//       return res.status(403).json({ error: "Token is not valid" });
+//     } else {
+//       req.user = decoded; // Attach the decoded token (which should include the user info) to the req object
+//       next();
+//     }
+//   });
+// }

@@ -1,4 +1,6 @@
 TO DO's:
+    - chance "secure" for production in authController.js
+    - add token on database
     - have 1 role per user VS many to many
     - String length constraints
     - Cascade on deletes
