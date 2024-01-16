@@ -9,6 +9,7 @@ router.post("/", loginLimiter, authController.login);
 
 router.get("/refresh", authController.refresh);
 
-router.post("/logout", authController.logout);
+// router.post("/logout", authController.logout);
+router.get("/logout", authController.logout);
 
 module.exports = router;

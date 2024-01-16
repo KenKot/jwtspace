@@ -27,8 +27,8 @@ const login = asyncHandler(async (req, res) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  // const foundUserRoles = await foundUser.fetchRoles();
-  const foundUserRoles = await foundUser.getRoles(); // getRoles() is a sequelize f(x)built in!!
+  const foundUserRoles = await foundUser.fetchRoles();
+  // const foundUserRoles = await foundUser.getRoles(); // getRoles() is a sequelize f(x)built in, but will include more data
 
   const accessToken = jwt.sign(
     {
@@ -50,8 +50,8 @@ const login = asyncHandler(async (req, res) => {
   // Create secure cookie with refresh token
   res.cookie("jwt", refreshToken, {
     httpOnly: true, //accessible only by web server
-    secure: false, //http
-    // secure: true, //https
+    // secure: false, //http (use for Thunder client)
+    secure: true, //https (use for browser)
     sameSite: "None", //cross-site cookie
     maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
   });
@@ -101,13 +101,13 @@ const refresh = asyncHandler(async (req, res) => {
 });
 
 // DESCRIPT: logout
-// ROUTE: POST /auth/logout
+// ROUTE: GET /auth/logout
 // ACCESS: public
 const logout = asyncHandler(async (req, res) => {
+  console.log("logout fired");
   const cookies = req.cookies;
   if (!cookies?.jwt) return res.sendStatus(204); //No content
   res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
-  // res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
   res.json({ message: "Cookie cleared" });
 });
 
