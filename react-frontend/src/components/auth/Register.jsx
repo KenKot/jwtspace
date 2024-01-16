@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 export default function Register() {
   const [firstName, setFirstName] = useState("");
@@ -24,9 +24,7 @@ export default function Register() {
       birthday,
     };
 
-    console.log("fffffff");
     console.log("newUserParams: ", newUserParams);
-    console.log("fffffff");
 
     try {
       const response = await fetch("http://localhost:3000/register", {
@@ -43,7 +41,7 @@ export default function Register() {
       }
 
       const responseData = await response.json();
-      const { userId } = responseData;
+      const {userId} = responseData;
       navigate(`/users/${userId}`);
     } catch (error) {
       alert(`Failed to create user: ${error.message}`);

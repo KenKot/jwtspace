@@ -16,14 +16,20 @@ module.exports = {
     );
 
     for (let i = 1; i < 11; i++) {
-      users.push({
+      const userObj = {
         email: `bob${i}@gmail.com`,
         username: `userbob${i}`,
         password: hashedPassword,
         firstName: `bob${i}`,
         lastName: `smith${i}`,
         birthday: "2004-01-16",
-      });
+      };
+
+
+
+
+
+      users.push(userObj);
     }
 
     return queryInterface.bulkInsert("Users", users);

@@ -1,42 +1,77 @@
-import React, { useState } from "react";
-import { useUserContext } from "../../contexts/UserContext";
+// OLD
+// import React, {useState, useContext} from "react";
+// import AuthContext from "../../contexts/AuthContext";
+
+// NEW
+import React, {useState} from "react";
+import useAuth from "../../hooks/useAuth";
+
+import {jwtDecode} from "jwt-decode";
+
+import axios from "../../api/axios";
+// const LOGIN_URL = "/auth";
+
+import {Link, useNavigate, useLocation} from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state?.from?.pathname || "/";
+
+  // OLD
+  // const {setAuth} = useContext(AuthContext);
+
+  // NEW
+  const {setAuth} = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errMsg, setErrMsg] = useState(""); // State to hold error message
-  const [successMsg, setSuccessMsg] = useState(""); // State to hold success message
-  const { login } = useUserContext();
+  // const {login} = useAuthContext();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setErrMsg(""); // Reset error message
-    setSuccessMsg(""); // Reset success message
 
     try {
-      await login({ email, password });
-      setSuccessMsg("Login successful!"); // Set success message
-      // Redirect or perform additional actions on successful login
-    } catch (err) {
-      if (!err.status) {
-        setErrMsg("No Server Response");
-      } else if (err.status === 400) {
-        setErrMsg("Missing Email or Password");
-      } else if (err.status === 401) {
-        setErrMsg("Unauthorized");
-      } else {
-        setErrMsg(err.data?.message || "An error occurred");
+      // const {accessToken} = await login({email, password})
+      // const response = await login({email, password});
+
+      const response = await axios.post(
+        "/auth",
+        JSON.stringify({email, password}),
+        {
+          headers: {"Content-Type": "application/json", withCredentials: true},
+        }
+      );
+
+      console.log(JSON.stringify(response?.data));
+
+      const accessToken = response?.data?.accessToken;
+      if (accessToken) {
+        const decoded = jwtDecode(accessToken);
+
+        const {userId, roles} = decoded.UserInfo;
+        setAuth({email, password, userId, roles});
       }
+
+      setEmail("");
+      setPassword("");
+      //from = where the user WANTED to go
+      navigate(from, {replace: true});
+    } catch (err) {
+      // if (!err.status) {
+      //   setErrMsg("No Server Response");
+      // } else if (err.status === 400) {
+      //   setErrMsg("Missing Username or Password");
+      // } else if (err.status === 401) {
+      //   setErrMsg("Unauthorized");
+      // } else {
+      //   setErrMsg(err.data?.message);
+      // }
     }
   };
 
   return (
     <form onSubmit={handleLogin}>
-      {/* Display error message */}
-      {errMsg && <div style={{ color: 'red' }}>{errMsg}</div>}
-      {/* Display success message */}
-      {successMsg && <div style={{ color: 'green' }}>{successMsg}</div>}
-
       <div>
         <label htmlFor="email">Email:</label>
         <input
@@ -50,15 +85,15 @@ export default function Login() {
       </div>
       <div>
         <label htmlFor="password">Password:</label>
+
         <input
           type="password"
           id="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
         />
       </div>
-      <button type="submit">Login</button>
+      <button>Login</button>
     </form>
   );
 }

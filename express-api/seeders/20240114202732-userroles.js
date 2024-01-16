@@ -11,6 +11,26 @@ module.exports = {
         userId: i,
         roleId: 1,
       });
+
+      //bob1 to test admin (role id's: 1,2,3)
+      //bob2 to test mod  (role id's: 1,2)
+
+      if (i === 1) {
+        userRoles.push({
+          userId: i,
+          roleId: 2,
+        });
+        userRoles.push({
+          userId: i,
+          roleId: 3,
+        });
+      }
+      if (i === 2) {
+        userRoles.push({
+          userId: i,
+          roleId: 2,
+        });
+      }
     }
 
     return queryInterface.bulkInsert("UserRoles", userRoles);

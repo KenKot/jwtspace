@@ -1,8 +1,18 @@
-import { Link } from "react-router-dom";
-import { useUserContext } from "../../contexts/UserContext";
+import {Link, useNavigate} from "react-router-dom";
+import {useContext} from "react";
+
+import useAuth from "../../hooks/useAuth";
 
 export default function Navbar() {
-  const { logout } = useUserContext();
+  const {setAuth} = useAuth();
+
+  const navigate = useNavigate();
+
+  const logout = (async) => {
+    console.log("logout from /navbar fired");
+    setAuth({});
+    navigate("/");
+  };
 
   return (
     <div>
@@ -23,6 +33,16 @@ export default function Navbar() {
           <Link to="/users/1">User 1</Link>
         </li>
       </ul>
+      <hr />
+      <Link to="/adminlounge">adminlounge</Link>
+      <br />
+      <Link to="/modlounge">modlounge</Link>
+      <br />
+
+      <Link to="/userlounge">userlounge</Link>
+      <br />
+      <hr />
+      <hr />
       <hr />
     </div>
   );

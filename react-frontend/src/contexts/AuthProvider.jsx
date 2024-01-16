@@ -1,16 +1,16 @@
-import React, { createContext, useState, useContext } from "react";
-import { jwtDecode } from "jwt-decode";
+import React, {createContext, useState, useContext} from "react";
+import {jwtDecode} from "jwt-decode";
 
-const UserContext = createContext();
+const AuthContext = createContext({});
 
-export const useUserContext = () => useContext(UserContext);
+export const AuthProvider = ({children}) => {
+  const [auth, setAuth] = useState(null);
 
-export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
 
   const login = async (userData) => {
-    const { email, password } = userData;
+    const {email, password} = userData;
 
     try {
       const response = await fetch("http://localhost:3000/auth", {
@@ -18,7 +18,7 @@ export const UserProvider = ({ children }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({email, password}),
         credentials: "include", // Needed for cookies to be sent and received
       });
 
@@ -26,17 +26,17 @@ export const UserProvider = ({ children }) => {
         throw new Error("Login failed"); // Provide a more specific error message based on response
       }
 
-      const { accessToken } = await response.json();
+      const {accessToken} = await response.json();
 
       if (accessToken) {
         setAccessToken(accessToken);
         const decoded = jwtDecode(accessToken);
 
-        const { userId, roles } = decoded.UserInfo;
+        const {userId, roles} = decoded.UserInfo;
         console.log("userId", userId);
         console.log("roles", roles);
 
-        setUser({ userId, roles }); // Adjust according to your token structure
+        setUser({userId, roles}); // Adjust according to your token structure
       }
     } catch (err) {
       console.error(err); // Log the error
@@ -73,8 +73,12 @@ export const UserProvider = ({ children }) => {
   // };
 
   return (
-    <UserContext.Provider value={{ user, accessToken, login, logout }}>
+    <AuthContext.Provider
+      value={{user, accessToken, login, logout, auth, setAuth}}
+    >
       {children}
-    </UserContext.Provider>
+    </AuthContext.Provider>
   );
 };
+
+export default AuthContext;
