@@ -3,15 +3,15 @@
 // import AuthContext from "../../contexts/AuthContext";
 
 // NEW
-import React, {useState} from "react";
+import React, { useState } from "react";
 import useAuth from "../../hooks/useAuth";
 
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 import axios from "../../api/axios";
 // const LOGIN_URL = "/auth";
 
-import {Link, useNavigate, useLocation} from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function Login() {
   // const {setAuth} = useContext(AuthContext);
 
   // NEW
-  const {setAuth} = useAuth();
+  const { setAuth } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,9 +37,12 @@ export default function Login() {
 
       const response = await axios.post(
         "/auth",
-        JSON.stringify({email, password}),
+        JSON.stringify({ email, password }),
         {
-          headers: {"Content-Type": "application/json", withCredentials: true},
+          headers: {
+            "Content-Type": "application/json",
+            withCredentials: true,
+          },
         }
       );
 
@@ -49,14 +52,14 @@ export default function Login() {
       if (accessToken) {
         const decoded = jwtDecode(accessToken);
 
-        const {userId, roles} = decoded.UserInfo;
-        setAuth({email, password, userId, roles});
+        const { userId, roles } = decoded.UserInfo;
+        setAuth({ email, password, userId, roles });
       }
 
       setEmail("");
       setPassword("");
       //from = where the user WANTED to go
-      navigate(from, {replace: true});
+      navigate(from, { replace: true });
     } catch (err) {
       // if (!err.status) {
       //   setErrMsg("No Server Response");
