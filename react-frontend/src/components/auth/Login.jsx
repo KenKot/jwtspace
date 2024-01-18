@@ -3,7 +3,7 @@
 // import AuthContext from "../../contexts/AuthContext";
 
 // NEW
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 
 import { jwtDecode } from "jwt-decode";
@@ -22,7 +22,7 @@ export default function Login() {
   // const {setAuth} = useContext(AuthContext);
 
   // NEW
-  const { setAuth } = useAuth();
+  const { setAuth, persist, setPersist } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,8 +41,8 @@ export default function Login() {
         {
           headers: {
             "Content-Type": "application/json",
-            withCredentials: true,
           },
+          withCredentials: true,
         }
       );
 
@@ -53,7 +53,9 @@ export default function Login() {
         const decoded = jwtDecode(accessToken);
 
         const { userId, roles } = decoded.UserInfo;
-        setAuth({ email, password, userId, roles });
+        setAuth({ userId, roles, accessToken });
+        // setAuth({ email, userId, roles, accessToken });
+        //change above not not use email (which is from state)
       }
 
       setEmail("");
@@ -72,6 +74,14 @@ export default function Login() {
       // }
     }
   };
+
+  const togglePersist = () => {
+    setPersist((prev) => !prev);
+  };
+
+  useEffect(() => {
+    localStorage.setItem("persist", persist);
+  }, [persist]);
 
   return (
     <form onSubmit={handleLogin}>
@@ -97,6 +107,13 @@ export default function Login() {
         />
       </div>
       <button>Login</button>
+      <input
+        type="checkbox"
+        id="persist"
+        onChange={togglePersist}
+        checked={persist}
+      />
+      <label htmlFor="persist">Trust this device</label>
     </form>
   );
 }

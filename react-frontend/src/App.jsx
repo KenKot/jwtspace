@@ -16,6 +16,8 @@ import UserLounge from "./components/testing/UserLounge";
 
 import RequireAuth from "./components/auth/RequireAuth";
 
+import PersistLogin from "./components/auth/PersistLogin";
+
 export default function App() {
   return (
     <div>
@@ -30,16 +32,18 @@ export default function App() {
           <Route path="unauthorized" element={<Unauthorized />} />
 
           {/* //PRIVATE ROUTES */}
-          <Route element={<RequireAuth allowedRoles={["user"]} />}>
-            <Route path="userlounge" element={<UserLounge />} />
-          </Route>
+          <Route element={<PersistLogin />}>
+            <Route element={<RequireAuth allowedRoles={["user"]} />}>
+              <Route path="userlounge" element={<UserLounge />} />
+            </Route>
 
-          <Route element={<RequireAuth allowedRoles={["moderator"]} />}>
-            <Route path="modlounge" element={<ModLounge />} />
-          </Route>
+            <Route element={<RequireAuth allowedRoles={["moderator"]} />}>
+              <Route path="modlounge" element={<ModLounge />} />
+            </Route>
 
-          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
-            <Route path="adminlounge" element={<AdminLounge />} />
+            <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+              <Route path="adminlounge" element={<AdminLounge />} />
+            </Route>
           </Route>
 
           {/* CATCH ALL */}

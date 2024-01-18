@@ -1,16 +1,22 @@
-import {Link, useNavigate} from "react-router-dom";
-import {useContext} from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
 
 import useAuth from "../../hooks/useAuth";
+import axios from "../../api/axios";
 
 export default function Navbar() {
-  const {setAuth} = useAuth();
+  const { setAuth } = useAuth();
 
   const navigate = useNavigate();
 
-  const logout = (async) => {
+  const logout = async () => {
     console.log("logout from /navbar fired");
     setAuth({});
+    try {
+      await axios.get("/auth/logout", { withCredentials: true });
+    } catch (err) {
+      console.error(err);
+    }
     navigate("/");
   };
 

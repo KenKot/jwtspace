@@ -1,11 +1,13 @@
 TO DO's:
     - chance "secure" for production in authController.js
     - add token on database
+      - have LOGOUT delete token in db
     - have 1 role per user VS many to many
     - String length constraints
     - Cascade on deletes
     - private/public profiles
     - last online
+    - 
     
 
 
