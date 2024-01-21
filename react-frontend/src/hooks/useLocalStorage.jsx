@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 
 const getLocalValue = (key, initValue) => {
   //SSR Next.js
@@ -14,7 +14,7 @@ const getLocalValue = (key, initValue) => {
   return initValue;
 };
 
-const useLocalStorage = (key, initValue) => {
+export default function useLocalStorage(key, initValue) {
   const [value, setValue] = useState(() => {
     return getLocalValue(key, initValue);
   });
@@ -24,6 +24,4 @@ const useLocalStorage = (key, initValue) => {
   }, [key, value]);
 
   return [value, setValue];
-};
-
-export default useLocalStorage;
+}
