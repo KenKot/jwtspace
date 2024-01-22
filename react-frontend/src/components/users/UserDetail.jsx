@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import axios from "../../api/axios";
 
 export default function UserDetail() {
   const { id } = useParams();
@@ -7,11 +8,12 @@ export default function UserDetail() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/users/${id}`)
-      .then((res) => res.json())
-      .then((jsonData) => {
-        setUser(jsonData);
-      });
+    const getUserProfile = async () => {
+      // const response = await axios.get(`http://localhost:3000/users/${id}`);
+      const response = await axios.get(`/users/${id}`);
+      setUser(response.data);
+    };
+    getUserProfile();
   }, [id]);
 
   if (!user) {

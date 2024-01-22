@@ -1,17 +1,9 @@
-// OLD
-// import React, {useState, useContext} from "react";
-// import AuthContext from "../../contexts/AuthContext";
-
-// NEW
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import useAuth from "../../hooks/useAuth";
 import useInput from "../../hooks/useInput";
-import useLocalStorage from "../../hooks/useLocalStorage";
-
-import { jwtDecode } from "jwt-decode";
+import useToggle from "../../hooks/useToggle";
 
 import axios from "../../api/axios";
-// const LOGIN_URL = "/auth";
 
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
@@ -20,23 +12,19 @@ export default function Login() {
   const location = useLocation();
   const from = location?.state?.from?.pathname || "/";
 
-  // OLD
-  // const {setAuth} = useContext(AuthContext);
-
   // NEW
-  const { setAuth, persist, setPersist } = useAuth();
+  const { setAuth } = useAuth();
 
-  const [email, setEmail] = useState("");
+  const [email, resetEmail, userAttribs] = useInput("email", "");
   const [password, setPassword] = useState("");
-  // const {login} = useAuthContext();
+  const [check, toggleCheck] = useToggle("persist", false);
+  const [errMsg, setErrMsg] = useState("");
+  const errRef = useRef();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      // const {accessToken} = await login({email, password})
-      // const response = await login({email, password});
-
       const response = await axios.post(
         "/auth",
         JSON.stringify({ email, password }),
@@ -51,71 +39,68 @@ export default function Login() {
       console.log(JSON.stringify(response?.data));
 
       const accessToken = response?.data?.accessToken;
-      if (accessToken) {
-        const decoded = jwtDecode(accessToken);
+      setAuth({ accessToken });
 
-        const { userId, roles } = decoded.UserInfo;
-        setAuth({ userId, roles, accessToken });
-        // setAuth({ email, userId, roles, accessToken });
-        //change above not not use email (which is from state)
-      }
-
-      setEmail("");
+      resetEmail("");
       setPassword("");
-      //from = where the user WANTED to go
-      navigate(from, { replace: true });
+
+      navigate(from, { replace: true }); //from = where the user WANTED to go
     } catch (err) {
-      // if (!err.status) {
-      //   setErrMsg("No Server Response");
-      // } else if (err.status === 400) {
-      //   setErrMsg("Missing Username or Password");
-      // } else if (err.status === 401) {
-      //   setErrMsg("Unauthorized");
-      // } else {
-      //   setErrMsg(err.data?.message);
-      // }
+      if (!err?.response) {
+        setErrMsg("No Server Response");
+      } else if (err.response?.status === 400) {
+        setErrMsg("Missing Username or Password");
+      } else if (err.response?.status === 401) {
+        setErrMsg("Unauthorized");
+      } else {
+        setErrMsg("Login Failed");
+      }
+      errRef.current.focus();
     }
   };
 
-  const togglePersist = () => {
-    setPersist((prev) => !prev);
-  };
-
-  useEffect(() => {
-    localStorage.setItem("persist", persist);
-  }, [persist]);
-
   return (
-    <form onSubmit={handleLogin}>
+    <>
       <div>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="off"
-          required
-        />
+        <p
+          ref={errRef}
+          className={errMsg ? "errmsg" : "offscreen"}
+          aria-live="assertive"
+        >
+          {errMsg}
+        </p>
       </div>
-      <div>
-        <label htmlFor="password">Password:</label>
+      <form onSubmit={handleLogin}>
+        <div>
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            {...userAttribs}
+            autoComplete="off"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="password">Password:</label>
 
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <button>Login</button>
         <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          type="checkbox"
+          id="persist"
+          onChange={toggleCheck}
+          checked={check}
         />
-      </div>
-      <button>Login</button>
-      <input
-        type="checkbox"
-        id="persist"
-        onChange={togglePersist}
-        checked={persist}
-      />
-      <label htmlFor="persist">Trust this device</label>
-    </form>
+        <label htmlFor="persist">Trust this device</label>
+      </form>
+    </>
   );
 }

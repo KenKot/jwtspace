@@ -1,24 +1,36 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import axios from "../../api/axios";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
-export default function AdminLounge() {
+export default function UserLounge() {
   const [messages, setMessages] = useState("");
 
+  const axiosPrivate = useAxiosPrivate();
+
   useEffect(() => {
-    const getLoungeMessages = async () => {
-      console.log("adminlounge.jsx fired");
-      // setAuth({});
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const getUsers = async () => {
       try {
-        const res = await axios.get("/test/userlounge", {
-          withCredentials: true,
+        const response = await axiosPrivate.get("/test/userlounge", {
+          // const response = await axios.get("/users", {
+          signal: controller.signal,
         });
-        setMessages(JSON.stringify(res));
+        console.log(response.data.message);
+        isMounted && setMessages(response.data.message);
       } catch (err) {
         console.error(err);
+        // navigate("/login", { state: { from: location }, replace: true });
       }
     };
 
-    getLoungeMessages();
+    getUsers();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, []);
 
   return <div>userlounge: {messages}</div>;

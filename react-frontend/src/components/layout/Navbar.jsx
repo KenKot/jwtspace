@@ -1,23 +1,14 @@
-import {Link, useNavigate} from "react-router-dom";
-import {useContext} from "react";
-
-import useAuth from "../../hooks/useAuth";
-import axios from "../../api/axios";
+import { Link, useNavigate } from "react-router-dom";
+import useLogout from "../../hooks/useLogout";
 
 export default function Navbar() {
-  const {setAuth} = useAuth();
-
   const navigate = useNavigate();
+  const logout = useLogout();
 
-  const logout = async () => {
-    console.log("logout from /navbar fired");
-    setAuth({});
-    try {
-      await axios.get("/auth/logout", {withCredentials: true});
-      window.location.reload();
-    } catch (err) {
-      console.error(err);
-    }
+  const signout = async () => {
+    await logout();
+    // navigate("/"); //isn't refreshing page
+    window.location.reload();
   };
 
   return (
@@ -33,7 +24,7 @@ export default function Navbar() {
           <Link to="/login">Log In</Link>
         </li>
         <li>
-          <button onClick={logout}>Logout</button>
+          <button onClick={signout}>Logout</button>
         </li>
         <li>
           <Link to="/users/1">User 1</Link>

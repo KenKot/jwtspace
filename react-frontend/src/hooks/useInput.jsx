@@ -1,4 +1,5 @@
 import useLocalStorage from "./useLocalStorage";
+
 export default function useInput(key, initValue) {
   const [value, setValue] = useLocalStorage(key, initValue);
 

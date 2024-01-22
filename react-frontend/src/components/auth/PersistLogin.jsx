@@ -1,5 +1,5 @@
-import {Outlet} from "react-router-dom";
-import {useState, useEffect} from "react";
+import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
 import useRefreshToken from "../../hooks/useRefreshToken";
 import useAuth from "../../hooks/useAuth";
 import useLocalStorage from "../../hooks/useLocalStorage";
@@ -7,8 +7,8 @@ import useLocalStorage from "../../hooks/useLocalStorage";
 export default function PersistLogin() {
   const [isLoading, setIsLoading] = useState(true);
   const refresh = useRefreshToken();
-  const {auth, persist} = useAuth();
-  //   const [persist] = useLocalStorage("persist", false);
+  const { auth } = useAuth();
+  const [persist] = useLocalStorage("persist", false);
 
   useEffect(() => {
     let isMounted = true;
@@ -24,6 +24,7 @@ export default function PersistLogin() {
     };
 
     // Avoids unwanted call to verifyRefreshToken
+    console.log("Do we have auth? (this is from persistlogin.jsx): ", auth);
     !auth?.accessToken && persist ? verifyRefreshToken() : setIsLoading(false);
 
     return () => (isMounted = false);

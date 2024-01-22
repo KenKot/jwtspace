@@ -7,7 +7,7 @@ const corsOptions = require("./config/corsOptions");
 
 const path = require("path");
 
-const {logger} = require("./middleware/logger");
+const { logger } = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
 
 const cookieParser = require("cookie-parser");
@@ -20,7 +20,7 @@ app.use("/", express.static(path.join(__dirname, "public"))); // or app.use(expr
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 
 app.use("/", require("./routes/root"));
 app.use("/users", require("./routes/users"));
@@ -29,14 +29,15 @@ app.use("/auth", require("./routes/auth"));
 
 const verifyRoles = require("./middleware/verifyRoles");
 const verifyJWT = require("./middleware/verifyJWT");
-app.use("/test", verifyJWT, require("./routes/lounges"));
+// app.use("/test", verifyJWT, require("./routes/lounges"));
+app.use("/test", require("./routes/lounges"));
 
 // app.use(verifyJWT)  A nice way to use waterfalling to protect routes after
 
 // for testing verifyJWT:
 app.get("/hi", require("./middleware/verifyJWT"), (req, res) => {
   // app.get("/hi", (req, res) => {
-  res.send({message: "hello"});
+  res.send({ message: "hello" });
 });
 
 // app.get("/", verifyToken, (req, res) => {
@@ -62,7 +63,7 @@ app.all("*", (req, res) => {
   if (req.accepts("html")) {
     res.sendFile(path.join(__dirname, "views/404.html"));
   } else if (req.accepts("json")) {
-    res.json({message: "404 not found"});
+    res.json({ message: "404 not found" });
   } else {
     res.type("txt").send("404 not found");
   }

@@ -5,21 +5,26 @@ const loungeController = require("../controllers/loungeController");
 
 const verifyRoles = require("../middleware/verifyRoles");
 
+const verifyJWT = require("../middleware/verifyJWT");
+
 router.get(
   "/userlounge",
-  //   verifyRoles(["users", "moderator", "admin"]),
+  verifyJWT,
   verifyRoles("user"),
   loungeController.getUserLoungeMessages
 );
-// router.get(
-//   "/modlounge",
-//   verifyRoles(["moderator", "admin"]),
-//   loungeController.getModLoungeMessages
-// );
-// router.get(
-//   "/adminlounge",
-//   verifyRoles(["admin"]),
-//   loungeController.getAdminLoungeMessages
-// );
+router.get(
+  "/modlounge",
+  verifyJWT,
+  verifyRoles("moderator", "admin"),
+  loungeController.getModLoungeMessages
+);
+
+router.get(
+  "/adminlounge",
+  verifyJWT,
+  verifyRoles("admin"),
+  loungeController.getAdminLoungeMessages
+);
 
 module.exports = router;

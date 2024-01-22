@@ -10,21 +10,21 @@ const asyncHandler = require("express-async-handler");
 // ROUTE: POST /auth
 // ACCESS: public
 const login = asyncHandler(async (req, res) => {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({message: "All fields required"});
+    return res.status(400).json({ message: "All fields required" });
   }
 
-  const foundUser = await User.findOne({where: {email}});
+  const foundUser = await User.findOne({ where: { email } });
   if (!foundUser || !foundUser.active) {
-    return res.status(401).json({message: "Unauthorized"});
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   const match = await bcrypt.compare(password, foundUser.password);
 
   if (!match) {
-    return res.status(401).json({message: "Unauthorized"});
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   const foundUserRoles = await foundUser.fetchRoles();
@@ -38,19 +38,20 @@ const login = asyncHandler(async (req, res) => {
       },
     },
     process.env.ACCESS_TOKEN_SECRET,
-    {expiresIn: "15s"}
+    { expiresIn: "15s" }
   );
 
   console.log("accessToken: ", accessToken);
 
   const refreshToken = jwt.sign(
-    {userId: foundUser.id},
+    { userId: foundUser.id },
     process.env.REFRESH_TOKEN_SECRET,
-    {expiresIn: "10m"}
+    // { expiresIn: "10s" }
+    { expiresIn: "1h" }
   );
 
   // Save token in user's DB (lets us invalidate token)
-  await foundUser.update({token: refreshToken});
+  await foundUser.update({ token: refreshToken });
 
   // Create secure cookie with refresh token
   res.cookie("jwt", refreshToken, {
@@ -62,7 +63,7 @@ const login = asyncHandler(async (req, res) => {
   });
 
   // Send accessToken containing username and roles
-  res.json({accessToken});
+  res.json({ accessToken });
 });
 
 // DESCRIPT: refresh
@@ -72,32 +73,34 @@ const refresh = asyncHandler(async (req, res) => {
   console.log("REFRESH RAN!!!");
   const cookies = req.cookies;
   console.log("cookies: ", cookies.jwt);
-  if (!cookies?.jwt) return res.status(401).json({message: "Unauthorized"});
+  if (!cookies?.jwt) return res.status(401).json({ message: "Unauthorized" });
   const refreshToken = cookies.jwt;
 
-  const foundUser = await User.findOne({token: refreshToken});
+  console.log("authController's refresh - refreshToken:", refreshToken);
 
-  if (!foundUser) return res.status(401).json({message: "Unauthorized"});
+  const foundUser = await User.findOne({ where: { token: refreshToken } });
+
+  if (!foundUser) return res.status(401).json({ message: "Unauthorized" });
   const foundUserRoles = await foundUser.fetchRoles();
 
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
     asyncHandler(async (err, decoded) => {
-      if (err) return res.status(403).json({message: "Forbidden"});
+      if (err) return res.status(403).json({ message: "Forbidden" });
 
       const accessToken = jwt.sign(
         {
           UserInfo: {
-            username: foundUser.username,
+            userId: foundUser.id,
             roles: foundUserRoles,
           },
         },
         process.env.ACCESS_TOKEN_SECRET,
-        {expiresIn: "15s"}
+        { expiresIn: "15s" }
       );
 
-      res.json({accessToken});
+      res.json({ accessToken });
     })
   );
 });
@@ -111,15 +114,16 @@ const logout = asyncHandler(async (req, res) => {
   if (!cookies?.jwt) return res.sendStatus(204); //No content
   const refreshToken = cookies.jwt;
 
-  const foundUser = await User.findOne({refreshToken});
+  const foundUser = await User.findOne({ where: { token: refreshToken } });
+
   if (!foundUser) {
-    res.clearCookie("jwt", {httpOnly: true, sameSite: "None", secure: true});
+    res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
     return res.sendStatus(204);
   }
 
-  await foundUser.update({token: ""});
-  res.clearCookie("jwt", {httpOnly: true, sameSite: "None", secure: true}); //secure is for https
+  await foundUser.update({ token: "" });
+  res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true }); //secure is for https
   res.sendStatus(204);
 });
 
-module.exports = {login, refresh, logout};
+module.exports = { login, refresh, logout };

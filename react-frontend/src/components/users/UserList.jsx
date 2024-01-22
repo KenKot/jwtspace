@@ -2,18 +2,13 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import useRefreshToken from "../../hooks/useRefreshToken";
-
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-// import axios from "../../api/axios";
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
 
   const navigate = useNavigate();
   const location = useLocation();
-
-  const refresh = useRefreshToken();
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
@@ -21,6 +16,7 @@ export default function UserList() {
     const controller = new AbortController();
 
     const getUsers = async () => {
+      console.log("UserList.jsx getUsers() fired");
       try {
         const response = await axiosPrivate.get("/users", {
           // const response = await axios.get("/users", {
@@ -29,7 +25,7 @@ export default function UserList() {
         console.log(response.data);
         isMounted && setUsers(response.data.users);
       } catch (err) {
-        console.error(err);
+        console.error("Catch fired: ", err);
         navigate("/login", { state: { from: location }, replace: true });
       }
     };
@@ -58,13 +54,6 @@ export default function UserList() {
   return (
     <>
       <h1>UserList</h1>
-      <button
-        onClick={() => {
-          refresh();
-        }}
-      >
-        refresh()
-      </button>
 
       {users.map((user) => (
         <div key={user.id}>
