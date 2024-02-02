@@ -106,7 +106,15 @@ querying attributes example:
 
 
 
+Seeds:
 
 
+    return queryInterface.bulkInsert("Users", users);
+
+    return queryInterface.bulkDelete("Users", null, {}, models.User);
+  
+
+  queries:
+  Friendship.findOne({where:{requestorId:2, requesteeId: 1}, attributes:['status']}).then(lg)
 
   

@@ -19,6 +19,15 @@ const verifyJWT = (req, res, next) => {
 
     req.user = decoded.UserInfo.userId;
     req.roles = decoded.UserInfo.roles;
+
+    console.log("typeof req.user: ", typeof req.user);
+
+    console.log(
+      "From verifyJWT middleware. req.user: ",
+      req.user,
+      "req.roles:",
+      req.roles
+    );
     next();
   });
 };

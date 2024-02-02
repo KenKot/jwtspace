@@ -8,7 +8,7 @@ const asyncHandler = require("express-async-handler");
 // ROUTE: /users/:id/profile
 // ACCESS: private
 const editProfile = asyncHandler(async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   const userId = id;
 
   //user id should be accessible on req.user
@@ -16,13 +16,13 @@ const editProfile = asyncHandler(async (req, res) => {
 
   console.log("edit profile from profilesController ran");
 
-  const profile = await Profile.findOne({where: {userId}});
+  const profile = await Profile.findOne({ where: { userId } });
   if (!profile) {
-    return res.status(404).json({message: "Profile not found"});
+    return res.status(404).json({ message: "Profile not found" });
   }
-  const updatedProfile = await profile.update({about: "it worked!"});
+  const updatedProfile = await profile.update({ about: "it worked!" });
 
-  res.send({updatedProfile});
+  res.send({ updatedProfile });
 });
 
-module.exports = {editProfile};
+module.exports = { editProfile };

@@ -8,15 +8,15 @@ const asyncHandler = require("express-async-handler");
 // ROUTE: /
 // ACCESS: public
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.findAll({attributes: ["username", "id"]});
-  res.send({users});
+  const users = await User.findAll({ attributes: ["username", "id"] });
+  res.send({ users });
 });
 
 // DESCRIPT: get one user (w/ their profile)
 // ROUTE: /users/:id
 // ACCESS: public
 const getUserProfileById = asyncHandler(async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
 
   const userProfile = await User.findByPk(id, {
     include: [
@@ -27,7 +27,19 @@ const getUserProfileById = asyncHandler(async (req, res) => {
     attributes: ["username", "firstName", "lastName", "birthday"],
   });
   console.log(userProfile);
-  res.send({userProfile});
+  res.send({ userProfile });
 });
 
-module.exports = {getUsers, getUserProfileById};
+// DESCRIPT: get user's friendlist
+// ROUTE: /users/:id/friends
+// ACCESS: public
+const getUserFriends = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const user = await User.findByPk(id);
+  const friends = await user.fetchFriends();
+
+  res.send({ friends });
+});
+
+module.exports = { getUsers, getUserProfileById, getUserFriends };

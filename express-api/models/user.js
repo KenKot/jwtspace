@@ -1,13 +1,7 @@
 "use strict";
-
-const {Model} = require("sequelize");
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       User.hasOne(models.Profile, {
         foreignKey: "userId",
@@ -17,8 +11,17 @@ module.exports = (sequelize, DataTypes) => {
         through: "UserRoles",
         foreignKey: "userId",
       });
+      User.hasMany(models.Friendship, {
+        as: "requestedFriendships",
+        foreignKey: "requestorId",
+      });
+
+      User.hasMany(models.Friendship, {
+        as: "receivedFriendships",
+        foreignKey: "requesteeId",
+      });
     }
-    // Instance method to get roles
+
     async fetchRoles() {
       try {
         // Calling Sequelize's built-in getRoles method
@@ -26,6 +29,69 @@ module.exports = (sequelize, DataTypes) => {
         return roles.map((role) => role.name);
       } catch (error) {
         console.error("Error fetching roles:", error);
+        throw error;
+      }
+    }
+    async fetchFriends() {
+      try {
+        const User = this.sequelize.model("User");
+
+        const requestedFriendships = await this.getRequestedFriendships({
+          where: { status: "accepted" },
+          include: [
+            {
+              model: User,
+              as: "requestee",
+              attributes: ["id", "username"],
+            },
+          ],
+        });
+
+        const receivedFriendships = await this.getReceivedFriendships({
+          where: { status: "accepted" },
+          include: [
+            {
+              model: User,
+              as: "requestor",
+              attributes: ["id", "username"],
+            },
+          ],
+        });
+
+        const friends = [
+          ...requestedFriendships.map((friendship) => friendship.requestee),
+          ...receivedFriendships.map((friendship) => friendship.requestor),
+        ];
+
+        return friends;
+      } catch (error) {
+        console.error("Error fetching friends:", error);
+        throw error;
+      }
+    }
+
+    async fetchFriendRequests() {
+      try {
+        const User = this.sequelize.model("User");
+
+        const receivedFriendships = await this.getReceivedFriendships({
+          where: { status: "pending" },
+          include: [
+            {
+              model: User,
+              as: "requestor",
+              attributes: ["id", "username"],
+            },
+          ],
+        });
+
+        const friends = [
+          ...receivedFriendships.map((friendship) => friendship.requestor),
+        ];
+
+        return friends;
+      } catch (error) {
+        console.error("Error fetching friends:", error);
         throw error;
       }
     }

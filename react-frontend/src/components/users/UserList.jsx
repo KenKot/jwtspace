@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import axios from "../../api/axios";
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
 
   const navigate = useNavigate();
   const location = useLocation();
-  const axiosPrivate = useAxiosPrivate();
+  // const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
     let isMounted = true;
@@ -18,8 +18,8 @@ export default function UserList() {
     const getUsers = async () => {
       console.log("UserList.jsx getUsers() fired");
       try {
-        const response = await axiosPrivate.get("/users", {
-          // const response = await axios.get("/users", {
+        // const response = await axios.get("/users");
+        const response = await axios.get("/users", {
           signal: controller.signal,
         });
         console.log(response.data);

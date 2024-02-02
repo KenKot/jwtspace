@@ -26,6 +26,7 @@ app.use("/", require("./routes/root"));
 app.use("/users", require("./routes/users"));
 app.use("/register", require("./routes/register"));
 app.use("/auth", require("./routes/auth"));
+app.use("/friendships", require("./routes/friendships"));
 
 const verifyRoles = require("./middleware/verifyRoles");
 const verifyJWT = require("./middleware/verifyJWT");

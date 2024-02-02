@@ -1,0 +1,49 @@
+body {
+  border: 2px solid red;
+  background-color: #ffcc99;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+.nav-cont {
+  border: 2px solid green;
+  background-color: #1d4ed8;
+  color: pink;
+
+  /* padding-left: 10%; */
+  /* padding-right: 10%; */
+}
+
+.nav-top a {
+  text-decoration: none;
+  color: white;
+}
+
+.nav-top {
+  border: 2px solid orange;
+  background-color: #1d4ed8;
+  color: pink;
+
+  align-items: center;
+
+  display: flex;
+  justify-content: space-between;
+  /* display: flex; */
+  /* justify-content: space-between; */
+}
+
+ul {
+  display: flex;
+  gap: 20px;
+  list-style-type: none;
+}
+
+.nav-bot {
+  border: 2px solid purple;
+  background-color: #5a93d9;
+  color: pink;
+  display: flex;
+  justify-content: center;
+}
+
+/* 0 0 7px #095DC3 */
