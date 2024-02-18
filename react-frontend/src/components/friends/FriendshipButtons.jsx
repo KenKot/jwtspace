@@ -54,7 +54,7 @@ export default function AddFriendButton({ authedUserId, id }) {
     //   }
     // };
 
-    if (authedUserId !== id) {
+    if (authedUserId && authedUserId !== id) {
       getStatus();
     }
 
